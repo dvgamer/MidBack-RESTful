@@ -10,17 +10,15 @@ const chalk   		= require('chalk');
 const cron 				= require('cron');
 const port				= 3000;
 
+// const api         = require('./api-v3/');
+
 // parse application/x-www-form-urlencoded
 express.use(bodyParser.urlencoded({ extended: false }))
 // parse application/json
 express.use(bodyParser.json());
 // HTTP request logger
-let common = `:method\t:url :status - :remote-addr :response-time ms`;
-express.use(morgan(common, {
-  // skip: function (req, res) { 
-  // 	return req.headers['Referer'] 
-  // }
-}));
+express.use(morgan(`:method\t:url :status - :remote-addr :response-time ms`));
+
 
 // index.html -- test socket.io
 // express.set("view options", { layout: false });
@@ -30,6 +28,8 @@ express.get('/', (req, res) => {
   // res.render('/view/index.html');
   res.end(JSON.stringify({ status: true }))
 });
+
+
 
 let noti = io.of('/noti').on('connection', function(socket){
   console.log(`SOCKET\t/noti client +1.`);
@@ -43,12 +43,10 @@ let noti = io.of('/noti').on('connection', function(socket){
   });
 });
 
-http.listen(port, function() {
-  console.log(`REST-API at ${moment().format("HH:mm:ss")} Started`);
-});
-
 // SIGINT, SIGTERM, and SIGKILL
 process.on('SIGINT', function() {
   console.log(`REST-API at ${moment().format("HH:mm:ss")} Shutdown...`);
   process.exit();
 }); 
+
+http.listen(port, () => { console.log(`REST-API at ${moment().format("HH:mm:ss")} Started`); });
