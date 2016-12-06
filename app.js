@@ -4,22 +4,43 @@ const express 		= require('express')();
 const bodyParser 	= require('body-parser')
 const morgan 			= require('morgan');
 const http 				= require("http").createServer(express);
+const io 					= require('socket.io')(http);
 const moment  		= require('moment');
 const chalk   		= require('chalk');
 const cron 				= require('cron');
-const port				= 80;
+const port				= 3000;
 
 // parse application/x-www-form-urlencoded
 express.use(bodyParser.urlencoded({ extended: false }))
 // parse application/json
 express.use(bodyParser.json());
 // HTTP request logger
-let common = `:method :url :status - :remote-addr :response-time ms`;
-express.use(morgan(common));
+let common = `:method\t:url :status - :remote-addr :response-time ms`;
+express.use(morgan(common, {
+  // skip: function (req, res) { 
+  // 	return req.headers['Referer'] 
+  // }
+}));
 
+// index.html -- test socket.io
+// express.set("view options", { layout: false });
+// express.use(require('express').static(__dirname + '/views/'));
 express.get('/', (req, res) => {
   res.setHeader('Content-Type', 'application/json');
-  res.send(JSON.stringify({ server: 'online' }));
+  // res.render('/view/index.html');
+  res.end(JSON.stringify({ status: true }))
+});
+
+let noti = io.of('/noti').on('connection', function(socket){
+  console.log(`SOCKET\t/noti client +1.`);
+
+  socket.on('message', function(msg){
+    console.log('message: ' + msg);
+  });
+
+  socket.on('disconnect', function(msg){
+    console.log(`SOCKET\t/noti client -1.`);
+  });
 });
 
 http.listen(port, function() {

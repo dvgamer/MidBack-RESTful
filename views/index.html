@@ -1,0 +1,26 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Socket.IO chat</title>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      body { font: 13px Helvetica, Arial; }
+    </style>
+  </head>
+  <body>
+    <ul id="messages"></ul>
+    <form action="">
+      <input id="m" autocomplete="off" /><button>Send Message</button>
+    </form>
+		<script src="dist/jquery.min.js"></script>
+		<script src="dist/socket.io.min.js"></script>
+		<script>
+		  var socket = io.connect('http://127.0.0.1/noti');
+      $('form').submit(function(){
+        if($('#m').val()) socket.emit('message', $('#m').val());
+        $('#m').val('');
+        return false;
+      });
+		</script>
+  </body>
+</html>
