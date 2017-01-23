@@ -1,5 +1,4 @@
 const request     = require('request');
-const bodyParser  = require('body-parser');
 const moment      = require('moment');
 
 let gdUsername = 'GWS/PCC79HG';
@@ -127,7 +126,6 @@ module.exports = function(req, res) {
         res.end(JSON.stringify(msg));
       }
     });
-
   } else {
     res.writeHead(404);
     res.end();

@@ -8,8 +8,8 @@ const io 					= require('socket.io')(http);
 const moment  		= require('moment');
 const chalk   		= require('chalk');
 const cron 				= require('cron');
-const port				= 3000;
 
+const port				= 3000;
 // const api         = require('./api-v3/');
 
 // parse application/x-www-form-urlencoded
@@ -17,12 +17,16 @@ express.use(bodyParser.urlencoded({ extended: false }))
 // parse application/json
 express.use(bodyParser.json());
 // HTTP request logger
-express.use(morgan(`:method\t:url :status - :remote-addr :response-time ms`));
-
+express.use(morgan(`:date[iso] :method\t:url :status - :remote-addr :response-time ms`));
 
 // index.html -- test socket.io
 // express.set("view options", { layout: false });
 // express.use(require('express').static(__dirname + '/views/'));
+
+express.post('/oauth', require('./oauth/authorize.js'));
+express.get('/token', require('./oauth/token.js'));
+
+express.use('/API-v3', require('./services/'));
 express.get('/', (req, res) => {
   res.setHeader('Content-Type', 'application/json');
   // res.render('/view/index.html');
@@ -49,4 +53,4 @@ process.on('SIGINT', function() {
   process.exit();
 }); 
 
-http.listen(port, () => { console.log(`REST-API at ${moment().format("HH:mm:ss")} Started`); });
+http.listen(port, () => { console.log(`REST-API at ${moment().format("YYYY-MMM-DD HH:mm:ss")} Started`); });
