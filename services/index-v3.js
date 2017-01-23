@@ -11,7 +11,7 @@ router.use('/*', function(req, res, next){
 })
 
 router.post('/SMS/', require('./thaibulksms/sms.js'));
-// router.post('/SMS/remain/', require('./thaibulksms/remain.js'));
+router.post('/SMS/remain/', require('./thaibulksms/remain.js'));
 router.post('/exchange-rate/', require('./travelport/exchange-rate.js'));
 
 module.exports = router;

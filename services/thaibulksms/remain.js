@@ -1,18 +1,23 @@
+const request     = require('request');
+const moment      = require('moment');
+
+const _DEBUG_      = !Boolean(process.env.PRODUCTION || false);
+
+let bulkUsername = 'travox_mbos@nippon';
+let bulkPassword = 'trav0x';
 
 module.exports = function(req, res) {
-	
+  let options = { 
+    method: 'POST',
+    url: _DEBUG_ ? 'http://www.thaibulksms.com/sms_api_test.php' : 'https://secure.thaibulksms.com/sms_api.php',
+    formData: {
+	    username: _DEBUG_ ? 'thaibulksms' : bulkUsername,
+	    password: _DEBUG_ ? 'thisispassword' : bulkPassword,
+    	tag: 'credit_remain_premium'
+    }
+  }
+	res.writeHead(200);
+  request(options, function (error, response, body) { 
+  	res.end(JSON.stringify({ remain: body })); 
+  });
 }
-
-
-
-// URL ใชง้านจรงิ :
-// https://secure.thaibulksms.com/sms_api.php?username=username&password=password&tag=cre
-// dit_remain
-// https://secure.thaibulksms.com/sms_api.php?username=username&password=password&tag=cre
-// dit_remain_premium
-// URL สา หรับทดสอบ : ( Standard คงเหลือ 100 เครดิต , Premium คงเหลือ 1,000 เครดิต )
-// https://secure.thaibulksms.com/sms_api_test.php?username=thaibulksms&password=thisispassw
-// ord&tag=credit_remain
-// https://secure.thaibulksms.com/sms_api_test.php?username=thaibulksms&password=thisispassw
-// ord&tag=credit_remain_premium
-// 6 การรับรายงานผลการสง่ ( Del
