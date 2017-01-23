@@ -8,8 +8,7 @@ let bulkUsername = 'travox_mbos@nippon';
 let bulkPassword = 'trav0x';
 let bulkForce  = 'premium';
 
-// console.log()
-
+console.log('_DEBUG_', _DEBUG_)
 module.exports = function(req, res) {
   if(req.headers['token-auth']) {
     let sender = req.body.sender || 'TRAVOX';
