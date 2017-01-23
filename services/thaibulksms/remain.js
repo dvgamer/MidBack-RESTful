@@ -16,7 +16,7 @@ module.exports = function(req, res) {
     	tag: 'credit_remain_premium'
     }
   }
-	res.writeHead(200);
+	res.writeHead(200, {"Content-Type": "application/json"});
   request(options, function (error, response, body) { 
   	res.end(JSON.stringify({ remain: body })); 
   });
