@@ -17,7 +17,7 @@ express.use(bodyParser.urlencoded({ extended: false }))
 // parse application/json
 express.use(bodyParser.json());
 // HTTP request logger
-express.use(morgan(`:date[iso] :method\t:url :status - :remote-addr :response-time ms`));
+express.use(morgan(`:date[iso] :method :status :remote-addr :response-time ms\t:url`));
 
 // index.html -- test socket.io
 // express.set("view options", { layout: false });
@@ -26,7 +26,8 @@ express.use(morgan(`:date[iso] :method\t:url :status - :remote-addr :response-ti
 express.post('/oauth', require('./oauth/authorize.js'));
 express.get('/token', require('./oauth/token.js'));
 
-express.use('/API-v3', require('./services/'));
+express.use('/API-v3', require('./services/index-v3.js'));
+express.use('/API', require('./services/index-v1.js'));
 express.get('/', (req, res) => {
   res.setHeader('Content-Type', 'application/json');
   // res.render('/view/index.html');
