@@ -116,7 +116,7 @@ module.exports = function(req, res) {
         let msg = (body.match(/<OutputMsg><Text><!\[CDATA\[([\w\W]+?)]]><\/Text><\/OutputMsg>/gi) || []).map(function(OutputMsg){
           let currency = /RATES LAST UPDATED(.*?)\r[\w\W]+?BANK SELLING RATE.*?(\d+?)(\w{3}).EQUALS.*?([\.\d]+)/ig.exec(OutputMsg);
           if(currency) return { 
-            updated: moment(currency[1].trim(), 'DDMMM hh:mm a').format('YYYY-MM-DD HH:MM:SS'), 
+            updated: moment(currency[1].trim(), 'DDMMM hh:mm a').format('YYYY-MM-DD HH:mm:ss:SSS'), 
             currency: currency[3].trim(), 
             rate: parseFloat(currency[4].trim()) 
           }
