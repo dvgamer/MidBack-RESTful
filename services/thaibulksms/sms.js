@@ -44,7 +44,7 @@ module.exports = function(req, res) {
           let query = `
             INSERT INTO [logs].[module_sms] ([msisdn],[message],[sender],[transaction],[used],[remain],[success],[status])
             VALUES ( '${data.msisdn}','${data.message}','${data.sender}',
-              '${!error?item[1]:''}',${!error?item[2]:'NULL'},${!error?item[3]:'NULL'},'${!error?'Y':'N'}','${error?error:''}')
+              '${!error?item[1]:''}',${!error?item[2]:'NULL'},${!error?item[3]:'NULL'},'${!error?'Y':'N'}','${error?error:'Sending'}')
           `;
           return new sql.Request().query(query);
         }).then(function(){
