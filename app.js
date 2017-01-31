@@ -9,6 +9,8 @@ const moment  		= require('moment');
 const chalk   		= require('chalk');
 const cron 				= require('cron');
 
+const imap        = require('./webmail/');
+
 const port				= 3000;
 // const api         = require('./api-v3/');
 
@@ -53,5 +55,7 @@ process.on('SIGINT', function() {
   console.log(`REST-API at ${moment().format("HH:mm:ss")} Shutdown...`);
   process.exit();
 }); 
+
+imap.connect();
 
 http.listen(port, () => { console.log(`REST-API at ${moment().format("YYYY-MMM-DD HH:mm:ss")} Started`); });
