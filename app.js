@@ -50,11 +50,6 @@ let noti = io.of('/noti').on('connection', function(socket){
   });
 });
 
-// SIGINT, SIGTERM, and SIGKILL
-process.on('SIGINT', function() {
-  console.log(`REST-API at ${moment().format("HH:mm:ss")} Shutdown...`);
-  process.exit();
-}); 
 
 imap.connect();
 
