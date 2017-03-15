@@ -12,9 +12,6 @@ let imap = {
   tls: false
 };
 
-// 
-
-
 let client = inbox.createConnection(false, imap.host, {
   secureConnection: false,
   auth:{ user: imap.username, pass: imap.password }
