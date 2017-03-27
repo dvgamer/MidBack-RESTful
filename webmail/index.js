@@ -7,13 +7,13 @@ const Q           = require('q');
 let imap = {
   username: 'pgm',
   password: '123456',
-  host: '192.168.10.2',
+  host: 'mail.ns.co.th',
   port: 143,
-  tls: false
+  tls: true
 };
 
 let client = inbox.createConnection(false, imap.host, {
-  secureConnection: false,
+  secureConnection: imap.tls,
   auth:{ user: imap.username, pass: imap.password }
 });
 
@@ -34,7 +34,6 @@ let moveArchive = function(UID, folder){
 
 
 let moveMessage = function(message) {
-  console.log(`${message.UID}: ${message.title}`);
   verifyMessage(message);
 }
 
@@ -52,31 +51,46 @@ let verifyMessage = function(message){
   msg.on('data', function(chunk) { contents += chunk.toString(); })
   msg.on('end', function() {
     contents = contents.replace(/=\r\n/ig, '');
+    contents = (/Content-Type: text\/html;[\W\w]*?\r\n\r\n([\W\w]+?)(\r\n\r\n|----)/ig.exec(contents)||[]);
+    if (!contents) throw new Error('Content-Type unknow');
+
+    let endcoding = (/Content-Transfer-Encoding:.(.*?)\r\n/ig.exec(contents[0])||[])[1];
+    if (!endcoding) throw new Error('Content-Transfer-Encoding unknow');
+
+    if(endcoding == 'base64') {
+      let buf = Buffer.from(contents[1].toString().trim(), 'base64');
+      contents = buf.toString()
+    }
+
     let getDB  = /VERIFY.DB.\[(.*?)\]/ig;
     let getBody = (/<body>([\W\w]*?)<\/body>/ig.exec(contents) || [])[1];
     let getUID = (/<title>MESSAGEID:.(\d+?)<\/title>/ig.exec(contents) || [])[1];
-    getDB = (getDB.exec(getBody || '') || [])[1];
 
-    if(getUID) {
+    if(!getUID) {
+      moveArchive(message.UID, '.unknow');
+    } else {
 
       let tran = new sql.Transaction(db);
       tran.begin().then(function() {
         var request = new sql.Request(tran);
 
-        let company_profile_config = `UPDATE ${getDB}.travoxmos.company_profile_config SET [value]='Y' WHERE [key]='CUSTOM_SMTP_EMAIL_VERIFY'`;
         let module_email = `UPDATE logs.module_email SET verify = GETDATE() WHERE id = ${getUID} AND verify IS NULL`;
 
         return request.query(module_email).then(function(){
           let verify_domain = /\[verify.domain\].*?`(.*?)`/ig;
           if(verify_domain.test(message.title)) {
-            console.log(`${message.UID}: Verify Domain update company_profile_config`);
+
+            getDB = (getDB.exec(getBody || '') || [])[1];
+            console.log(`${getUID}: Verify Domain update company_profile_config`);
+            
+            let company_profile_config = `UPDATE ${getDB}.travoxmos.company_profile_config SET [value]='Y' WHERE [key]='CUSTOM_SMTP_EMAIL_VERIFY'`;
             return request.query(company_profile_config).then(function(){
 
-              console.log(`${message.UID} ${moment(message.date).format("YYYY-MMM-DD HH:mm:ss")}: moveArchive(Archive)`);
+              console.log(`${getUID} ${moment(message.date).format("YYYY-MMM-DD HH:mm:ss")}: moveArchive(Archive)`);
               return moveArchive(message.UID, 'Archive');
             });
           } else {
-            console.log(`${message.UID} ${moment(message.date).format("YYYY-MMM-DD HH:mm:ss")}: moveArchive(Notifications)`);
+            console.log(`${getUID} ${moment(message.date).format("YYYY-MMM-DD HH:mm:ss")}: moveArchive(Notifications)`);
             return moveArchive(message.UID, 'Notifications');
           }
         }).then(function(){
@@ -98,8 +112,8 @@ client.on("connect", function(){
       if(error) throw error;
         
       db.connect().then(function() {
-        client.listMessages(-10, function(err, messages){
-          messages.forEach(moveMessage);
+        client.listMessages(-100, function(err, messages){
+          if (err) console.log('listMessages', err); else (messages || []).forEach(moveMessage);
         });
         client.on("new", function(message){ moveMessage(message); });
       }).catch(function(err) {

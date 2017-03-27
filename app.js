@@ -3,7 +3,7 @@
 const express 		= require('express')();
 const bodyParser 	= require('body-parser')
 const morgan 			= require('morgan');
-const http 				= require("http").createServer(express);
+const http 				= require('http').createServer(express);
 const io 					= require('socket.io')(http);
 const moment  		= require('moment');
 const chalk   		= require('chalk');
@@ -22,7 +22,7 @@ express.use(bodyParser.json());
 express.use(morgan(`:date[iso] :method :status :remote-addr :response-time ms\t:url`));
 
 // index.html -- test socket.io
-// express.set("view options", { layout: false });
+// express.set('view options', { layout: false });
 // express.use(require('express').static(__dirname + '/views/'));
 
 express.post('/oauth', require('./oauth/authorize.js'));
@@ -53,4 +53,4 @@ let noti = io.of('/noti').on('connection', function(socket){
 
 imap.connect();
 
-http.listen(port, () => { console.log(`REST-API at ${moment().format("YYYY-MMM-DD HH:mm:ss")} Started`); });
+http.listen(port, () => { console.log(`REST-API at ${moment().format('YYYY-MMM-DD HH:mm:ss')} Started`); });
